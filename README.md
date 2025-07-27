@@ -20,7 +20,7 @@ A complete Laravel 11 project with multi-authentication system featuring Admin a
 1. **Clone and Install Dependencies**
 
 ```bash
-git clone https://github.com/Lakshu96/Laravel-Admin-panel-With-role-base
+git clone <repository-url>
 cd laravel-admin-dashboard
 composer install
 ```
@@ -183,13 +183,14 @@ routes/
 6. Set up proper file permissions
 7. Configure caching and queue drivers
 
+## License
 
-````
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
 
 ## Installation Commands Summary
 
 ```bash
-
 # 1. Composer update
 composer update
 
@@ -201,4 +202,4 @@ php artisan migrate --seed
 
 # 4. Start development server
 php artisan serve
-````
+
