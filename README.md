@@ -21,7 +21,7 @@ A complete Laravel 11 project with multi-authentication system featuring Admin a
 
 ```bash
 git clone https://github.com/Lakshu96/Laravel-Admin-panel-With-role-base
-cd laravel-admin-dashboard
+cd Laravel-Admin-panel-With-role-base
 composer install
 ```
 
