@@ -5,25 +5,21 @@
 
 @section('content')
 <div class="space-y-6">
-    <!-- Header -->
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-gray-900">Users Management</h1>
+        @canAccess('users.create')
         <a href="{{ route('admin.users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
             <i class="fas fa-plus mr-2"></i>
             Add New User
         </a>
+        @endcanAccess
     </div>
     
-    <!-- Filters -->
     <div class="bg-white rounded-lg shadow p-6">
         <form method="GET" action="{{ route('admin.users.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="md:col-span-2">
                 <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-                <input type="text" 
-                       id="search" 
-                       name="search" 
-                       value="{{ request('search') }}"
-                       placeholder="Search by name or email..."
+                <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Search by name or email..."
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             
@@ -31,8 +27,9 @@
                 <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
                 <select id="role" name="role" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">All Roles</option>
-                    <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="user" {{ request('role') === 'user' ? 'selected' : '' }}>User</option>
+                    @foreach($filterRoles as $roleName)
+                        <option value="{{ $roleName }}" {{ request('role') === $roleName ? 'selected' : '' }}>{{ $roleName }}</option>
+                    @endforeach
                 </select>
             </div>
             
@@ -56,7 +53,6 @@
         </form>
     </div>
     
-    <!-- Users Table -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -86,8 +82,9 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' }}">
-                                {{ ucfirst($user->role) }}
+                            @php $rn = $user->roles->first()?->name ?? $user->role; @endphp
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {{ $rn }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -99,21 +96,21 @@
                             {{ $user->created_at->format('M d, Y') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                            <a href="{{ route('admin.users.show', $user) }}" class="text-blue-600 hover:text-blue-900">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{{ route('admin.users.edit', $user) }}" class="text-green-600 hover:text-green-900">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                            @canAccess('users.view')
+                            <a href="{{ route('admin.users.show', $user) }}" class="text-blue-600 hover:text-blue-900"><i class="fas fa-eye"></i></a>
+                            @endcanAccess
+                            @canAccess('users.edit')
+                            <a href="{{ route('admin.users.edit', $user) }}" class="text-green-600 hover:text-green-900"><i class="fas fa-edit"></i></a>
+                            @endcanAccess
+                            @canAccess('users.delete')
                             @if($user->id !== auth()->id())
                             <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this user?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <button type="submit" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
                             </form>
                             @endif
+                            @endcanAccess
                         </td>
                     </tr>
                     @empty

@@ -2,20 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
-
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(User::class, 'user');
+    }
+
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::query()->with('roles');
 
-        // Search functionality
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
@@ -24,29 +29,38 @@ class UserController extends Controller
             });
         }
 
-        // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->get('status'));
         }
 
-        // Filter by role
         if ($request->filled('role')) {
-            $query->where('role', $request->get('role'));
+            $query->whereHas('roles', fn ($q) => $q->where('name', $request->get('role')));
         }
 
         $users = $query->latest()->paginate(10)->withQueryString();
+        $filterRoles = Role::query()->orderBy('name')->pluck('name');
 
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users', 'filterRoles'));
     }
 
     public function create()
     {
-        return view('admin.users.create');
+        $roles = Role::query()->where('guard_name', 'web')->orderBy('name')->pluck('name', 'name');
+        $permissions = Permission::query()->orderBy('module_name')->orderBy('name')->get()->groupBy(fn ($p) => $p->module_name ?? 'general');
+
+        return view('admin.users.create', compact('roles', 'permissions'));
     }
 
     public function store(StoreUserRequest $request)
     {
-        User::create($request->validated());
+        $data = $request->validated();
+        $roleName = $data['role'];
+        $direct = $data['direct_permissions'] ?? [];
+        unset($data['direct_permissions']);
+
+        $user = User::create($data);
+        $user->syncRoles([$roleName]);
+        $user->syncPermissions($direct);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User created successfully.');
@@ -54,24 +68,34 @@ class UserController extends Controller
 
     public function show(User $user)
     {
+        $user->load(['roles', 'permissions']);
+
         return view('admin.users.show', compact('user'));
     }
 
     public function edit(User $user)
     {
-        return view('admin.users.edit', compact('user'));
+        $roles = Role::query()->where('guard_name', 'web')->orderBy('name')->pluck('name', 'name');
+        $permissions = Permission::query()->orderBy('module_name')->orderBy('name')->get()->groupBy(fn ($p) => $p->module_name ?? 'general');
+        $user->load(['roles', 'permissions']);
+
+        return view('admin.users.edit', compact('user', 'roles', 'permissions'));
     }
 
     public function update(UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
+        $roleName = $data['role'];
+        $direct = $data['direct_permissions'] ?? [];
+        unset($data['direct_permissions']);
 
-        // Remove password if not provided
         if (empty($data['password'])) {
             unset($data['password']);
         }
 
         $user->update($data);
+        $user->syncRoles([$roleName]);
+        $user->syncPermissions($direct);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User updated successfully.');
@@ -79,7 +103,6 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        // Prevent deleting current user
         if ($user->id === auth()->id()) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'You cannot delete your own account.');

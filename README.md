@@ -198,3 +198,10 @@ php artisan migrate --seed
 # 4. Start development server
 php artisan serve
 
+
+
+composer require spatie/laravel-permission doctrine/dbal
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+php artisan migrate
+php artisan db:seed
+php artisan make:module-permission Product

@@ -1,6 +1,8 @@
 <?php
 
 namespace Database\Seeders;
+
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -9,25 +11,52 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create default admin
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@yopmail.com',
-            'password' => 'admin@123',
-            'role' => 'admin',
-            'status' => 'active',
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@yopmail.com'],
+            [
+                'name' => 'Admin User',
+                'password' => 'admin@123',
+                'role' => 'admin',
+                'status' => 'active',
+            ]
+        );
+        $admin->forceFill(['role' => 'admin', 'name' => 'Admin User', 'status' => 'active'])->save();
+        $admin->syncRoles(['admin']);
+        $admin->syncPermissions([]);
 
-        // Create test users
-        User::factory(20)->create();
+        User::factory(20)->create()->each(function (User $user) {
+            $roleName = match ($user->role) {
+                'admin', 'Admin' => 'admin',
+                'technician' => 'technician',
+                'kit_assigner' => 'kit_assigner',
+                default => 'user',
+            };
+            if (Role::where('name', $roleName)->exists()) {
+                $user->syncRoles([$roleName]);
+            }
+        });
 
-        // Create specific test user
-        User::create([
-            'name' => 'Test User',
-            'email' => 'user@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'user',
-            'status' => 'active',
-        ]);
+        $testUser = User::firstOrCreate(
+            ['email' => 'user@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => 'password',
+                'role' => 'user',
+                'status' => 'active',
+            ]
+        );
+        $testUser->forceFill(['role' => 'user', 'name' => 'Test User', 'status' => 'active'])->save();
+        $testUser->syncRoles(['user']);
+
+        // $super = User::firstOrCreate(
+        //     ['email' => 'superadmin@example.com'],
+        //     [
+        //         'name' => 'Super Admin',
+        //         'password' => Hash::make('password'),
+        //         'role' => 'Super Admin',
+        //         'status' => 'active',
+        //     ]
+        // );
+        // $super->syncRoles(['Super Admin']);
     }
 }

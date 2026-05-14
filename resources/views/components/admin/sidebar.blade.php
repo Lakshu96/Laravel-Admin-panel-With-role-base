@@ -4,17 +4,37 @@
     </div>
     
     <nav class="mt-8">
+        @canAccess('admin.dashboard')
         <a href="{{ route('admin.dashboard') }}" 
            class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700 text-white border-r-4 border-blue-500' : '' }}">
             <i class="fas fa-tachometer-alt mr-3"></i>
             Dashboard
         </a>
+        @endcanAccess
         
+        @canAccess('users.view')
         <a href="{{ route('admin.users.index') }}" 
            class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.users.*') ? 'bg-gray-700 text-white border-r-4 border-blue-500' : '' }}">
             <i class="fas fa-users mr-3"></i>
             Users
         </a>
+        @endcanAccess
+
+        @canAccess('roles.view')
+        <a href="{{ route('admin.roles.index') }}" 
+           class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.roles.*') ? 'bg-gray-700 text-white border-r-4 border-blue-500' : '' }}">
+            <i class="fas fa-user-shield mr-3"></i>
+            Roles
+        </a>
+        @endcanAccess
+
+        @canAccess('trucks.view')
+        <a href="{{ route('admin.trucks.index') }}" 
+           class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.trucks.*') ? 'bg-gray-700 text-white border-r-4 border-blue-500' : '' }}">
+            <i class="fas fa-truck mr-3"></i>
+            Trucks
+        </a>
+        @endcanAccess
         
         <div class="border-t border-gray-700 mt-8 pt-4">
             <form method="POST" action="{{ route('logout') }}" class="px-6">
