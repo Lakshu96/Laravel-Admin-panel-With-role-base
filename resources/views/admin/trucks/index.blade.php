@@ -45,6 +45,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Units</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total MSRP</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created by</th>
@@ -57,6 +58,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $truck->name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $truck->units_on_truck }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${{ number_format($truck->cost_of_truck, 2) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${{ number_format($truck->total_appliance_msrp ?? 0, 2) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $truck->arrival_date ? $truck->arrival_date : '—' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $truck->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
@@ -84,7 +86,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">No trucks found.</td>
+                        <td colspan="8" class="px-6 py-8 text-center text-gray-500">No trucks found.</td>
                     </tr>
                     @endforelse
                 </tbody>

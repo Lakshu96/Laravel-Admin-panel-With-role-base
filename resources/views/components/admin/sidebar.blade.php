@@ -28,6 +28,22 @@
         </a>
         @endcanAccess
 
+        @canAccess('parts.view')
+        <a href="{{ route('admin.parts.index') }}" 
+           class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.parts.*') ? 'bg-gray-700 text-white border-r-4 border-blue-500' : '' }}">
+            <i class="fas fa-cogs mr-3"></i>
+            Parts
+        </a>
+        @endcanAccess
+
+        @canAccess('models.view')
+        <a href="{{ route('admin.models.index') }}" 
+           class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.models.*') ? 'bg-gray-700 text-white border-r-4 border-blue-500' : '' }}">
+            <i class="fas fa-cube mr-3"></i>
+            Models
+        </a>
+        @endcanAccess
+
         @canAccess('trucks.view')
         <a href="{{ route('admin.trucks.index') }}" 
            class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.trucks.*') ? 'bg-gray-700 text-white border-r-4 border-blue-500' : '' }}">

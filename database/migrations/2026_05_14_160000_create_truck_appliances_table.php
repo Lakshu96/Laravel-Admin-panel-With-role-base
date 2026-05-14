@@ -11,19 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('models', function (Blueprint $table) {
+        Schema::create('truck_appliances', function (Blueprint $table) {
             $table->id();
-            $table->string('model_number');
-            $table->string('product_name')->nullable();
+            $table->foreignId('truck_id')->constrained('trucks')->cascadeOnDelete();
             $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
+            $table->foreignId('model_id')->nullable()->constrained('models')->nullOnDelete();
+            $table->string('serial_number')->nullable();
             $table->string('brand')->nullable();
-            $table->string('msrp')->nullable();
-            $table->tinyInteger('status')->default(1)->comment('1: Active, 0: Inactive');
+            $table->string('product_name')->nullable();
+            $table->decimal('msrp', 10, 2)->default(0);
+            $table->string('receiving_condition')->nullable();
+            $table->decimal('total_parts_cost', 10, 2)->default(0);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->index('truck_id');
+            $table->index('category_id');
+            $table->index('model_id');
         });
     }
 
@@ -32,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('models');
+        Schema::dropIfExists('truck_appliances');
     }
 };

@@ -11,19 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('models', function (Blueprint $table) {
+        Schema::create('parts', function (Blueprint $table) {
             $table->id();
-            $table->string('model_number');
+            $table->string('part_number')->unique();
             $table->string('product_name')->nullable();
-            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
-            $table->string('brand')->nullable();
-            $table->string('msrp')->nullable();
-            $table->tinyInteger('status')->default(1)->comment('1: Active, 0: Inactive');
+            $table->string('model_compatibility')->nullable();
+            $table->unsignedInteger('total_stock')->default(0);
+            $table->decimal('retail_price', 12, 2)->default(0);
+            $table->decimal('your_price', 12, 2)->default(0);
+            $table->string('cross_reference')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->index('product_name');
+            $table->index('model_compatibility');
         });
     }
 
@@ -32,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('models');
+        Schema::dropIfExists('parts');
     }
 };

@@ -4,20 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Truck extends Model
+class Part extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
-        'name',
-        'units_on_truck',
-        'cost_of_truck',
-        'arrival_date',
-        'status',
-        'notes',
+        'part_number',
+        'product_name',
+        'model_compatibility',
+        'total_stock',
+        'retail_price',
+        'your_price',
+        'cross_reference',
         'created_by',
         'updated_by',
     ];
@@ -25,9 +25,9 @@ class Truck extends Model
     protected function casts(): array
     {
         return [
-            'arrival_date' => 'date',
-            'units_on_truck' => 'integer',
-            'cost_of_truck' => 'decimal:2',
+            'total_stock' => 'integer',
+            'retail_price' => 'decimal:2',
+            'your_price' => 'decimal:2',
         ];
     }
 
@@ -39,10 +39,5 @@ class Truck extends Model
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
-    }
-
-    public function appliances(): HasMany
-    {
-        return $this->hasMany(TruckAppliance::class);
     }
 }

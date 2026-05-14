@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTruckRequest;
 use App\Http\Requests\UpdateTruckRequest;
+use App\Models\Category;
+use App\Models\Model as ApplianceModel;
 use App\Models\Truck;
 use Illuminate\Http\Request;
 
@@ -21,7 +23,10 @@ class TruckController extends Controller
 
     public function index(Request $request)
     {
-        $query = Truck::query()->with('creator')->latest();
+        $query = Truck::query()
+            ->with('creator')
+            ->withSum('appliances as total_appliance_msrp', 'msrp')
+            ->latest();
 
         if ($request->filled('search')) {
             $search = $request->string('search')->trim();
@@ -55,9 +60,18 @@ class TruckController extends Controller
 
     public function show(Truck $truck)
     {
-        $truck->load(['creator', 'updater']);
+        $truck->load([
+            'creator',
+            'updater',
+            'appliances' => fn ($query) => $query->with(['category', 'model'])->latest(),
+        ]);
 
-        return view('admin.trucks.show', compact('truck'));
+        $categoryIds = $truck->appliances->pluck('category_id')->filter()->unique()->values();
+        $modelIds = $truck->appliances->pluck('model_id')->filter()->unique()->values();
+        $categories = Category::query()->whereIn('id', $categoryIds)->orderBy('name')->get();
+        $models = ApplianceModel::query()->whereIn('id', $modelIds)->orderBy('model_number')->get();
+
+        return view('admin.trucks.show', compact('truck', 'categories', 'models'));
     }
 
     public function edit(Truck $truck)

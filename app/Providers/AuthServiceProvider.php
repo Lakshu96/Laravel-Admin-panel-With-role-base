@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
-use App\Models\Product;
+use App\Models\Part;
+use App\Models\Model;
 use App\Models\Truck;
 use App\Models\User;
-use App\Policies\ProductPolicy;
+use App\Policies\ModelPolicy;
+use App\Policies\PartPolicy;
 use App\Policies\TruckPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -20,7 +22,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         User::class => UserPolicy::class,
-        Product::class => ProductPolicy::class,
+        Model::class => ModelPolicy::class,
+        Part::class => PartPolicy::class,
         Truck::class => TruckPolicy::class,
     ];
 

@@ -4,7 +4,7 @@
 @section('page-title', 'Truck details')
 
 @section('content')
-<div class="max-w-3xl mx-auto">
+<div class="max-w-7xl mx-auto space-y-6">
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4">
             <h2 class="text-xl font-semibold text-gray-900">{{ $truck->name }}</h2>
@@ -73,5 +73,122 @@
         </div>
         @endcanAccess
     </div>
+
+    @canAccess('appliance.create')
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-blue-600 px-6 py-4">
+            <h2 class="text-xl font-semibold text-white">Add New Appliance to Truck</h2>
+        </div>
+        <form method="POST" action="{{ route('admin.trucks.appliances.store', $truck) }}" class="p-6 space-y-6">
+            @csrf
+            <input type="hidden" name="_form" value="create-appliance">
+            @include('admin.trucks.partials.appliance-form', [
+                'truck' => $truck,
+                'appliance' => null,
+                'categories' => $categories,
+                'models' => $models,
+                'prefix' => 'create-appliance',
+            ])
+
+            <div class="flex justify-end gap-2">
+                <button type="reset" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">Reset</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <i class="fas fa-save mr-2"></i>Submit
+                </button>
+            </div>
+        </form>
+    </div>
+    @endcanAccess
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-blue-600 px-6 py-4">
+            <h2 class="text-xl font-semibold text-white">Truck Appliances ({{ $truck->appliances->count() }} total)</h2>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial #</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MSRP</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receiving Condition</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Parts Cost</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($truck->appliances as $appliance)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $appliance->category?->name ?? '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $appliance->model?->model_number ?? '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $appliance->serial_number ?: '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $appliance->brand ?: '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $appliance->product_name ?: '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${{ number_format($appliance->msrp, 2) }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $appliance->receiving_condition ?: '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${{ number_format($appliance->total_parts_cost, 2) }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            @canAccess('appliance.edit')
+                            <button type="button" class="text-green-600 hover:text-green-900" title="Edit" data-toggle-row="appliance-edit-{{ $appliance->id }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            @endcanAccess
+                            @canAccess('appliance.delete')
+                            <form action="{{ route('admin.trucks.appliances.destroy', [$truck, $appliance]) }}" method="POST" class="inline" onsubmit="return confirm('Remove this appliance from truck?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-900" title="Delete"><i class="fas fa-trash"></i></button>
+                            </form>
+                            @endcanAccess
+                        </td>
+                    </tr>
+                    @canAccess('appliance.edit')
+                    <tr id="appliance-edit-{{ $appliance->id }}" class="{{ $errors->any() && old('_form') === 'edit-appliance-'.$appliance->id ? '' : 'hidden' }} bg-gray-50">
+                        <td colspan="9" class="px-4 py-4">
+                            <form method="POST" action="{{ route('admin.trucks.appliances.update', [$truck, $appliance]) }}" class="space-y-6">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="_form" value="edit-appliance-{{ $appliance->id }}">
+                                @include('admin.trucks.partials.appliance-form', [
+                                    'truck' => $truck,
+                                    'appliance' => $appliance,
+                                    'categories' => $categories->merge($appliance->category ? collect([$appliance->category]) : collect())->unique('id'),
+                                    'models' => $models->merge($appliance->model ? collect([$appliance->model]) : collect())->unique('id'),
+                                    'prefix' => 'edit-appliance-'.$appliance->id,
+                                ])
+
+                                <div class="flex justify-end gap-2">
+                                    <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600" data-toggle-row="appliance-edit-{{ $appliance->id }}">Cancel</button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                        <i class="fas fa-save mr-2"></i>Update
+                                    </button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    @endcanAccess
+                    @empty
+                    <tr>
+                        <td colspan="9" class="px-6 py-8 text-center text-gray-500">No appliances assigned to this truck.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+@include('admin.shared.ajax-dropdowns')
 @endsection
+
+@push('scripts')
+<script>
+    $('[data-toggle-row]').on('click', function () {
+        $('#' + $(this).data('toggle-row')).toggleClass('hidden');
+    });
+</script>
+@endpush

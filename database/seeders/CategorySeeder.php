@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\ModelCategory;
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 
-class ModelCategorySeeder extends Seeder
+class CategorySeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -25,7 +25,7 @@ class ModelCategorySeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            ModelCategory::query()->updateOrInsert(
+            Category::query()->updateOrInsert(
                 ['name' => $category],
                 [
                     'status' => 1,
