@@ -17,7 +17,7 @@ class RolePermissionSeeder extends Seeder
         $guard = 'web';
 
         $definitions = [
-            ['name' => 'admin.dashboard', 'module_name' => 'admin', 'description' => 'Access admin dashboard'],
+            ['name' => 'admin.dashboard', 'module_name' => 'dashboard', 'description' => 'Access admin dashboard'],
             ['name' => 'users.view', 'module_name' => 'users', 'description' => 'List users'],
             ['name' => 'users.create', 'module_name' => 'users', 'description' => 'Create users'],
             ['name' => 'users.edit', 'module_name' => 'users', 'description' => 'Edit users'],

@@ -46,12 +46,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('dropdowns/models', [DropdownController::class, 'models'])
         ->middleware('permission:parts.view|parts.create|parts.edit|models.view|appliance.create|appliance.edit')
         ->name('dropdowns.models');
+    Route::get('dropdowns/brands', [DropdownController::class, 'brands'])
+        ->middleware('permission:models.view|models.create|models.edit|appliance.create|appliance.edit')
+        ->name('dropdowns.brands');
     Route::post('dropdowns/categories', [DropdownController::class, 'storeCategory'])
         ->middleware('permission:category.create|models.create')
         ->name('dropdowns.categories.store');
     Route::post('dropdowns/models', [DropdownController::class, 'storeModel'])
         ->middleware('permission:models.create')
         ->name('dropdowns.models.store');
+    Route::post('dropdowns/brands', [DropdownController::class, 'storeBrand'])
+        ->middleware('permission:models.create|models.edit|appliance.create|appliance.edit')
+        ->name('dropdowns.brands.store');
 
     Route::resource('users', UserController::class);
 
