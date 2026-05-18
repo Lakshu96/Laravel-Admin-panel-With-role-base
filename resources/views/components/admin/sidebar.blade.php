@@ -55,6 +55,22 @@
             <span>Trucks</span>
         </a>
         @endcanAccess
+
+        @canAccess('sales.view')
+        <a href="{{ route('admin.sales.index') }}" 
+           class="ui-nav-link flex items-center px-4 py-3 text-sm font-semibold {{ request()->routeIs('admin.sales.*') ? 'is-active' : '' }}">
+            <i class="fas fa-cash-register mr-3 w-5 text-center"></i>
+            <span>Sales</span>
+        </a>
+        @endcanAccess
+
+        @canAccess('inventory.view')
+        <a href="{{ route('admin.inventory.index') }}" 
+           class="ui-nav-link flex items-center px-4 py-3 text-sm font-semibold {{ request()->routeIs('admin.inventory.*') ? 'is-active' : '' }}">
+            <i class="fas fa-boxes-stacked mr-3 w-5 text-center"></i>
+            <span>Inventory</span>
+        </a>
+        @endcanAccess
         
         <div class="border-t border-white/10 mt-8 pt-4 mx-3">
             <form method="POST" action="{{ route('logout') }}">
